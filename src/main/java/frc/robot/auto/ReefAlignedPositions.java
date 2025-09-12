@@ -88,7 +88,7 @@ public final class ReefAlignedPositions {
     };
 
     /**
-     * 
+     * Gets the aligned position closest to the robot on its side of the reef midway line.
      * @param position - The position to calculate distance from (generally the robot).
      * @param direction - The direction to align, robot-relative while facing tag, left or right (-1, 0, 1).
      * @return The aligned Pose closest to the robot with that direction in front of the tag.
@@ -127,7 +127,7 @@ public final class ReefAlignedPositions {
     }
 
     /**
-     * Helper that searches an array for the closest position on the robot's side of the midway line.
+     * Helper that searches an array for the closest position on the robot's side of the reef midway line.
      * @param position - The position to calculate distance from (generally the robot).
      * @param direction - The direction to align, robot-relative while facing tag, left or right (-1, 0, 1).
      * @return The closest position.
