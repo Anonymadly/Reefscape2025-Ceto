@@ -186,6 +186,10 @@ public class RobotContainer {
         ElevatorSubsystem.getInstance();
         CoralSubsystem.getInstance();
         AlgaeSubsystem.getInstance();
+
+        // Replace calls to SwerveSubsystem's getState().Pose with this class
+        // if you are testing and want to control the robot's position through NetworkTables.
+        // SimulateRobotPosition.getInstance();
     }
 
     /** Register all NamedCommands for PathPlanner use */
