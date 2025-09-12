@@ -6,8 +6,6 @@
 
 package frc.robot.auto;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -18,10 +16,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.AprilTagMap;
-import frc.robot.constants.LimelightConstants;
-import frc.robot.constants.Constants.AligningConstants;
-import frc.robot.constants.Constants.TagSets;
 import frc.robot.led.LEDSubsystem;
 import frc.robot.led.StatusColors;
 import frc.robot.swerve.SwerveSubsystem;
@@ -36,12 +30,10 @@ public class PIDAlignReefCommand extends Command {
     private final double[] ZERO_ARRAY = new double[] { 0, 0, 0 };
     
     private final int direction;
-    private final boolean flipTags;
+    private final boolean flipDirection;
     private final boolean coralFirst;
-    private final boolean waitForLimelights;
     
     private Pose2d targetPose;
-    private int targetID;
 
     private Pose2d changePose2d;
 
@@ -57,17 +49,15 @@ public class PIDAlignReefCommand extends Command {
     /**
      * Creates a new PIDAlignCommand.
      * @param direction - The direction to align, robot-relative when facing the tag (-1, 0, 1).
-     * @param flipTags - Whether to flip the tags on the opposite side of the driver to be driver-relative.
+     * @param flipDirection - Whether to flip the direction when the driver is past the midway point of the reef.
      * @param coralFirst - Whether to align further away considering for a coral.
-     * @param waitForLimelights - Wait for data to be up-to-date.
      */
-    public PIDAlignReefCommand(int direction, boolean flipTags, boolean coralFirst, boolean waitForLimelights) {
+    public PIDAlignReefCommand(int direction, boolean flipDirection, boolean coralFirst) {
         setName("PIDAlignReefCommand");
 
         this.direction = (int) Math.signum(direction);
-        this.flipTags = flipTags;
+        this.flipDirection = flipDirection;
         this.coralFirst = coralFirst;
-        this.waitForLimelights = waitForLimelights;
         this.timer = new Timer();
 
         this.xController.setTolerance(0.005);
@@ -88,18 +78,12 @@ public class PIDAlignReefCommand extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        this.targetID = VisionSubsystem.getInstance().getPrimaryTagInView();
-        this.targetPose = AprilTagMap.calculateReefAlignedPosition(
-            this.targetID,
-            this.direction * (this.flipTags && TagSets.REEF_TAGS_FLIPPED.contains(this.targetID) ? -1 : 1)
+        Translation2d robotPose = SwerveSubsystem.getInstance().getState().Pose.getTranslation();
+        // targetPose should be Pose2d.kZero if the closest position is too far.
+        this.targetPose = ReefAlignedPositions.getClosestReefAlignedPosition(
+            robotPose,
+            this.direction * (this.flipDirection && ReefAlignedPositions.isPositionDriverSideOfReef(robotPose) ? 1 : -1)
         );
-
-        if (
-            SwerveSubsystem.getInstance().getDistance(this.targetPose.getTranslation())
-            .in(Meters) >= LimelightConstants.REEF_ALIGN_RANGE
-        ) {
-            this.targetPose = Pose2d.kZero;
-        }
         
         SmartDashboard.putNumberArray("Aligning Target Pose", VisionSubsystem.pose2dToArray(this.targetPose));
         
@@ -204,7 +188,7 @@ public class PIDAlignReefCommand extends Command {
                 -xChange * robotSin + yChange * robotCos
             ).minus(
                 this.coralFirst
-                    ? new Translation2d(AligningConstants.Reef.CORAL_DISTANCE, 0)
+                    ? new Translation2d(ReefAlignedPositions.CORAL_DISTANCE, 0)
                     : Translation2d.kZero
             ),
             this.targetPose.getRotation().minus(robotPose.getRotation())

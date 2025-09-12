@@ -4,8 +4,6 @@
 
 package frc.robot.vision;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -27,17 +25,10 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.constants.Constants.TagSets;
 import frc.robot.constants.LimelightConstants;
-import frc.robot.led.LEDSubsystem;
-import frc.robot.led.StatusColors;
 import frc.robot.swerve.SwerveSubsystem;
-import frc.robot.constants.AprilTagMap;
-
-import org.littletonrobotics.junction.Logger;
 
 /** 
  * A class that manages AprilTag Limelights for vision.
@@ -111,30 +102,6 @@ public class VisionSubsystem extends SubsystemBase {
     public void periodic() {
         // Uses a Notifier for separate-thread Vision processing
         // These methods are here because they are NOT thread-safe
-        
-        int primaryTag = getPrimaryTagInView();
-        boolean reef = TagSets.REEF_TAGS.contains(primaryTag);
-
-        if (
-            SwerveSubsystem.getInstance().getDistance(
-                AprilTagMap.getPoseFromID(primaryTag)
-            )
-            .in(Meters) >= LimelightConstants.REEF_ALIGN_RANGE
-        ) {
-            reef = false;
-        }
-
-        SmartDashboard.putNumberArray(
-            "Primary Tag In View", 
-            VisionSubsystem.pose2dToArray(AprilTagMap.getPoseFromID(primaryTag, true))
-        );
-
-        SmartDashboard.putBoolean("Vision/ReefInView", reef);
-        Logger.recordOutput("Vision/ReefInView", reef);
-        
-        if (reef && DriverStation.isEnabled()) {
-            LEDSubsystem.getInstance().setColor(StatusColors.CAN_ALIGN);
-        }
     }
 
     /**

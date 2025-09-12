@@ -11,20 +11,25 @@ import java.io.File;
 
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.*;
+import frc.robot.auto.ReefAlignedPositions;
 import frc.robot.constants.Constants;
 import frc.robot.utilities.Elastic;
+import frc.robot.vision.VisionSubsystem;
 
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.led.LEDSubsystem;
 import frc.robot.led.StatusColors;
+import frc.robot.swerve.SwerveSubsystem;
 
 public class Robot extends LoggedRobot {
     private Command auton;
@@ -88,9 +93,40 @@ public class Robot extends LoggedRobot {
         //     error.printStackTrace();
         // }
 
-        double voltage = RobotController.getBatteryVoltage();
-        SmartDashboard.putNumber("Voltage", voltage);
-        Logger.recordOutput("Voltage", voltage);
+        // Updating SmartDashboard with reef alignment telemetry. This used to be in the vision subsystem's periodiic.
+        // It can technically be moved back there but it uses no vision (not directly at least).
+
+        Translation2d robotPose = SwerveSubsystem.getInstance().getState().Pose.getTranslation();
+        Pose2d closestLeftPose = ReefAlignedPositions.getClosestReefAlignedPosition(robotPose, -1);
+        Pose2d closestMiddlePose = ReefAlignedPositions.getClosestReefAlignedPosition(robotPose, 0);
+        Pose2d closestRightPose = ReefAlignedPositions.getClosestReefAlignedPosition(robotPose, 1);
+
+        double[] array = VisionSubsystem.pose2dToArray(closestLeftPose);
+        SmartDashboard.putNumberArray("Closest Left Align", array);
+        Logger.recordOutput("Closest Left Align", array);
+
+        array = VisionSubsystem.pose2dToArray(closestMiddlePose);
+        SmartDashboard.putNumberArray("Closest Middle Align", array);
+        Logger.recordOutput("Closest Middle Align", array);
+
+        array = VisionSubsystem.pose2dToArray(closestRightPose);
+        SmartDashboard.putNumberArray("Closest Right Align", array);
+        Logger.recordOutput("Closest Right Align", array);
+
+        boolean canAlign = closestLeftPose != Pose2d.kZero
+            && closestMiddlePose != Pose2d.kZero
+            && closestRightPose != Pose2d.kZero;
+
+        SmartDashboard.putBoolean("Vision/CanAlign", canAlign);
+        Logger.recordOutput("Vision/CanAlign", canAlign);
+
+        boolean flippedAligningControls = !ReefAlignedPositions.isPositionDriverSideOfReef(robotPose);
+        SmartDashboard.putBoolean("Flipped Aligning Controls", flippedAligningControls);
+        Logger.recordOutput("Flipped Aligning Controls", flippedAligningControls);
+        
+        if (canAlign && DriverStation.isEnabled()) {
+            LEDSubsystem.getInstance().setColor(StatusColors.CAN_ALIGN);
+        }
     }
 
     @Override

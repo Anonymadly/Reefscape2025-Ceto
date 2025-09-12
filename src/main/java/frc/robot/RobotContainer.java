@@ -230,13 +230,13 @@ public class RobotContainer {
             CommandGenerators.DisableAlgaeCommand());
         
         NamedCommands.registerCommand("PIDAlignRightReef", CommandGenerators.WaitForLimelightsCommand(
-            new PIDAlignReefCommand(1, false, false, true)
+            new PIDAlignReefCommand(1, false, false)
         ));
         NamedCommands.registerCommand("PIDAlignLeftReef", CommandGenerators.WaitForLimelightsCommand(
-            new PIDAlignReefCommand(-1, false, false, true)
+            new PIDAlignReefCommand(-1, false, false)
         ));
         NamedCommands.registerCommand("PIDAlignCenterReef", CommandGenerators.WaitForLimelightsCommand(
-            new PIDAlignReefCommand(0, false, false, true)
+            new PIDAlignReefCommand(0, false, false)
         ));
     }
 
@@ -268,15 +268,15 @@ public class RobotContainer {
         this.driverController.x().whileTrue(new OscillateXDirectionCommand());
 
         this.driverController.leftBumper().whileTrue(Commands.sequence(
-            CommandGenerators.WaitForLimelightsCommand(new PIDAlignReefCommand(-1, true, true, true)),
-            new PIDAlignReefCommand(-1, true, false, false)
+            CommandGenerators.WaitForLimelightsCommand(new PIDAlignReefCommand(-1, true, true)),
+            new PIDAlignReefCommand(-1, true, false)
         ));
         this.driverController.rightBumper().whileTrue(Commands.sequence(
-            CommandGenerators.WaitForLimelightsCommand(new PIDAlignReefCommand(1, true, true, true)),
-            new PIDAlignReefCommand(1, true, false, false)
+            CommandGenerators.WaitForLimelightsCommand(new PIDAlignReefCommand(1, true, true)),
+            new PIDAlignReefCommand(1, true, false)
         ));
         this.driverController.a().whileTrue(
-            CommandGenerators.WaitForLimelightsCommand(new PIDAlignReefCommand(0, false, false, true))
+            CommandGenerators.WaitForLimelightsCommand(new PIDAlignReefCommand(0, false, false))
         );
     }
 
