@@ -104,7 +104,7 @@ public final class CommandGenerators {
      */
     public static Command WaitForLimelightsCommand(Command PIDAlignCommand) {
         final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("#.##");
-        Timer timeoutTimer = new Timer();
+        final Timer timeoutTimer = new Timer();
 
         return Commands.sequence(
             Commands.runOnce(() -> timeoutTimer.restart()),
@@ -112,12 +112,12 @@ public final class CommandGenerators {
             Commands.waitUntil(() -> {
                 VisionSubsystem.getInstance().waitingForLimelights = true;
 
-                if (!timeoutTimer.hasElapsed(DriverStation.isTeleop() ? 0.5 : 1)) {
-                    return SwerveSubsystem.getInstance().getDistance(
-                        VisionSubsystem.getInstance().getPose2d().pose2d.getTranslation()
-                    ).in(Meters) <= 0.1;
-                }
-                else {
+                if (
+                    timeoutTimer.hasElapsed(DriverStation.isTeleop() ? 0.5 : 1)
+                    || SwerveSubsystem.getInstance().getDistance(
+                            VisionSubsystem.getInstance().getPose2d().pose2d.getTranslation()
+                        ).in(Meters) <= 0.1
+                ) {
                     String wastedTime = DOUBLE_FORMAT.format(timeoutTimer.get());
                     Logger.recordOutput("PIDAlign Wasted Time", wastedTime);
                     
@@ -129,6 +129,9 @@ public final class CommandGenerators {
 
                     VisionSubsystem.getInstance().waitingForLimelights = false;
                     return true;
+                }
+                else {
+                    return false;
                 }
             }),
 
