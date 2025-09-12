@@ -37,6 +37,7 @@ import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.swerve.SwerveTelemetry;
 import frc.robot.swerve.TunerConstants;
 import frc.robot.utilities.CommandGenerators;
+import frc.robot.utilities.SimulateRobotPosition;
 import frc.robot.vision.VisionSubsystem;
 
 import java.util.Map;
@@ -186,6 +187,10 @@ public class RobotContainer {
         ElevatorSubsystem.getInstance();
         CoralSubsystem.getInstance();
         AlgaeSubsystem.getInstance();
+
+        // Replace calls to SwerveSubsystem's getState().Pose with this class
+        // if you are testing and want to control the robot's position through NetworkTables.
+        // SimulateRobotPosition.getInstance();
     }
 
     /** Register all NamedCommands for PathPlanner use */
