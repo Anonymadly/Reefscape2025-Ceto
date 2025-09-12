@@ -24,8 +24,8 @@ public final class ReefAlignedPositions {
     public static final double REEF_ALIGN_RANGE = 2.0;
 
     // x-coordinates
-    private static final double RED_MID_REEF_LINE = 4.4893;
-    private static final double BLUE_MID_REEF_LINE = 13.0589;
+    private static final double RED_MID_REEF_LINE = 13.0589;
+    private static final double BLUE_MID_REEF_LINE = 4.4893;
 
     private static final Pose2d[][] RED_SIDE = {
         { // LEFT
@@ -96,6 +96,7 @@ public final class ReefAlignedPositions {
      */
     public static Pose2d getClosestReefAlignedPosition(Translation2d position, int direction) {
         Optional<Alliance> alliance = DriverStation.getAlliance();
+        System.out.println(alliance.isEmpty());
 
         Pose2d blue, red;
         blue = red = Pose2d.kZero;
