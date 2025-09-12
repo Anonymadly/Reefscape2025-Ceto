@@ -93,7 +93,11 @@ public class Robot extends LoggedRobot {
         //     error.printStackTrace();
         // }
 
-        // Updating SmartDashboard with reef alignment telemetry. This used to be in the vision subsystem's periodiic.
+        double voltage = RobotController.getBatteryVoltage();
+        SmartDashboard.putNumber("Voltage", voltage);
+        Logger.recordOutput("Voltage", voltage);
+
+        // Updating SmartDashboard with reef alignment telemetry. This used to be in the vision subsystem's periodic.
         // It can technically be moved back there but it uses no vision (not directly at least).
 
         Translation2d robotPose = SwerveSubsystem.getInstance().getState().Pose.getTranslation();
