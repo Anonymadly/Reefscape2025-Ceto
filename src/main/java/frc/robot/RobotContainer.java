@@ -37,6 +37,7 @@ import frc.robot.swerve.SwerveSubsystem;
 import frc.robot.swerve.SwerveTelemetry;
 import frc.robot.swerve.TunerConstants;
 import frc.robot.utilities.CommandGenerators;
+import frc.robot.utilities.SimulateRobotPosition;
 import frc.robot.vision.VisionSubsystem;
 
 import java.util.Map;
