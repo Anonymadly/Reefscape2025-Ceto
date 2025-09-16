@@ -101,6 +101,11 @@ public final class ReefAlignedPositions {
         Pose2d blue, red;
         blue = red = Pose2d.kZero;
 
+        /* These orElse calls make sure that if the alliance variable is an empty optional (which has only ever happened
+         * once to us, but it has happened), it fills it with both blue and red, so it ends up getting the closest position
+         * irrelevant of alliance. If you ever use this optional you should always handle the fact that it *CAN* be empty,
+         * otherwise you may end up with crashed robot code when you .get() and end up with null.
+         */
         if (alliance.orElse(Alliance.Blue) == Alliance.Blue) {
             blue = findClosestPoseInArray(position, ReefAlignedPositions.BLUE_SIDE[direction + 1]);
         }
@@ -112,6 +117,9 @@ public final class ReefAlignedPositions {
         if (blue == Pose2d.kZero) return red;
         if (red == Pose2d.kZero) return blue;
 
+        /* This is only ever called if the alliance is null and both blue and red sides were queried, so it compares
+         * them to find the closest one overall.
+         */
         return position.getDistance(blue.getTranslation()) < position.getDistance(red.getTranslation())
             ? blue : red;
     }
