@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.constants.LimelightConstants;
 
 /**
  * Utility classes to store every aligned position (grabbed from {@link AprilTagMap#calculateReefAlignedPosition(int, int)}).
@@ -20,7 +19,10 @@ import frc.robot.constants.LimelightConstants;
 public final class ReefAlignedPositions {
     /** Coral distance added before the real lign up in meters. Can technically score from here if pushing into a coral. */
     public static final double CORAL_DISTANCE = 0.11 /* Coral diameter */;
-    /** In meters. */
+    /** 
+     * In meters, the max distance the robot's position can be from the target position.
+     * @see {@link ReefAlignedPositions#findClosestPoseInArray(Translation2d, Pose2d[])}
+     */
     public static final double REEF_ALIGN_RANGE = 2.0;
 
     // x-coordinates
@@ -92,7 +94,7 @@ public final class ReefAlignedPositions {
      * @param position - The position to calculate distance from (generally the robot).
      * @param direction - The direction to align, robot-relative while facing tag, left or right (-1, 0, 1).
      * @return The aligned Pose closest to the robot with that direction in front of the tag.
-     * @apiNote Returns Pose2d.kZero if the closest distance is greater than {@link LimelightConstants.REEF_ALIGN_RANGE}.
+     * @apiNote Returns Pose2d.kZero if the closest distance is greater than {@link ReefAlignedPositions#REEF_ALIGN_RANGE}.
      */
     public static Pose2d getClosestReefAlignedPosition(Translation2d position, int direction) {
         Optional<Alliance> alliance = DriverStation.getAlliance();
@@ -139,7 +141,7 @@ public final class ReefAlignedPositions {
      * @param position - The position to calculate distance from (generally the robot).
      * @param direction - The direction to align, robot-relative while facing tag, left or right (-1, 0, 1).
      * @return The closest position.
-     * @apiNote Returns Pose2d.kZero if the closest position is further than {@link LimelightConstants#REEF_ALIGN_RANGE}.
+     * @apiNote Returns Pose2d.kZero if the closest position is further than {@link ReefAlignedPositions#REEF_ALIGN_RANGE}.
      */
     private static Pose2d findClosestPoseInArray(Translation2d position, Pose2d[] poses) {
         double distance = -1;
